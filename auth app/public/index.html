@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System - API Tester</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="12" fill="url(#gradient)" />
+                        <path
+                            d="M20 12C16.6863 12 14 14.6863 14 18V20C14 20.5523 14.4477 21 15 21H25C25.5523 21 26 20.5523 26 20V18C26 14.6863 23.3137 12 20 12Z"
+                            fill="white" />
+                        <rect x="13" y="20" width="14" height="10" rx="2" fill="white" />
+                        <circle cx="20" cy="25" r="2" fill="url(#gradient)" />
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div>
+                        <h1>Auth System</h1>
+                        <p>JWT Authentication API Tester</p>
+                    </div>
+                </div>
+                <div class="status-badge" id="serverStatus">
+                    <span class="status-dot"></span>
+                    <span>Checking...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Token Display -->
+        <div class="token-display" id="tokenDisplay" style="display: none;">
+            <div class="token-header">
+                <span>🔑 Active Token</span>
+                <button class="btn-clear" onclick="clearToken()">Clear</button>
+            </div>
+            <div class="token-value" id="tokenValue"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="register" onclick="switchTab('register')">
+                    <span>📝</span> Register
+                </button>
+                <button class="tab" data-tab="login" onclick="switchTab('login')">
+                    <span>🔐</span> Login
+                </button>
+                <button class="tab" data-tab="profile" onclick="switchTab('profile')">
+                    <span>👤</span> Profile
+                </button>
+                <button class="tab" data-tab="update" onclick="switchTab('update')">
+                    <span>✏️</span> Update
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Register Tab -->
+                <div class="tab-pane active" id="register">
+                    <h2>Register New User</h2>
+                    <p class="description">Create a new account with username, email, and password</p>
+
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="reg-username">Username</label>
+                            <input type="text" id="reg-username" placeholder="johndoe" required minlength="3"
+                                maxlength="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Email</label>
+                            <input type="email" id="reg-email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" placeholder="Min 6 characters" required
+                                minlength="6">
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <span class="btn-text">Register User</span>
+                            <span class="btn-loader" style="display: none;">
+                                <div class="spinner"></div>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Login Tab -->
+                <div class="tab-pane" id="login">
+                    <h2>User Login</h2>
+                    <p class="description">Login with your email and password to get JWT token</p>
+
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" placeholder="Your password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <span class="btn-text">Login</span>
+                            <span class="btn-loader" style="display: none;">
+                                <div class="spinner"></div>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Profile Tab -->
+                <div class="tab-pane" id="profile">
+                    <h2>Get User Profile</h2>
+                    <p class="description">Retrieve your profile information (requires authentication)</p>
+
+                    <div class="protected-notice">
+                        🔒 This is a protected route. You need to login first to get a token.
+                    </div>
+
+                    <button onclick="handleGetProfile()" class="btn-primary">
+                        <span class="btn-text">Get Profile</span>
+                        <span class="btn-loader" style="display: none;">
+                            <div class="spinner"></div>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Update Tab -->
+                <div class="tab-pane" id="update">
+                    <h2>Update Profile</h2>
+                    <p class="description">Update your username or email (requires authentication)</p>
+
+                    <div class="protected-notice">
+                        🔒 This is a protected route. You need to login first to get a token.
+                    </div>
+
+                    <form onsubmit="handleUpdateProfile(event)">
+                        <div class="form-group">
+                            <label for="update-username">New Username (optional)</label>
+                            <input type="text" id="update-username" placeholder="new_username" minlength="3"
+                                maxlength="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-email">New Email (optional)</label>
+                            <input type="email" id="update-email" placeholder="newemail@example.com">
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <span class="btn-text">Update Profile</span>
+                            <span class="btn-loader" style="display: none;">
+                                <div class="spinner"></div>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Response Display -->
+            <div class="response-container" id="responseContainer" style="display: none;">
+                <div class="response-header">
+                    <span>Response</span>
+                    <button class="btn-clear" onclick="clearResponse()">Clear</button>
+                </div>
+                <div class="response-status" id="responseStatus"></div>
+                <pre class="response-body" id="responseBody"></pre>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with Node.js, Express.js, MongoDB & JWT</p>
+            <div class="footer-links">
+                <a href="https://jwt.io/" target="_blank">JWT Docs</a>
+                <span>•</span>
+                <a href="https://www.postman.com/" target="_blank">Postman</a>
+                <span>•</span>
+                <a href="#" onclick="showApiDocs()">API Docs</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
